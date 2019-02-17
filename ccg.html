@@ -5,15 +5,36 @@
         .category {
             font-family: Arial, Helvetica, sans-serif;
             font-style: italic;
-            font-size: 14px;
+            font-size: 18px;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently */
         }
         .word {
-            font-size: 12px;
+            font-size: 14px;
+        }
+        input {
+            border: 1px dotted black;
+            background: white;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 5px 10px;
+            font-size: 18px;
+            width: 200px;
+            color:black;
+        }
+        input:focus {
+            background-color:lightcoral;
+            outline: none;
         }
         </style>
+        <link rel="stylesheet" href="d3-context-menu.css" />
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="d3-context-menu.js"></script>
     </head>
     <body>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="ccg.js"></script>
     </body>
 </html>
