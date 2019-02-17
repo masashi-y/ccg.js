@@ -14,7 +14,6 @@ d3.contextMenu = function (menu, openCallback) {
 	// this gets executed when a contextmenu event occurs
 	return function(data, index) {	
 		var elm = this;
-		console.log('aaaa');
 
 		d3.selectAll('.d3-context-menu').html('');
 		var list = d3.selectAll('.d3-context-menu').append('ul');
