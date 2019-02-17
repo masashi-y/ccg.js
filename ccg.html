@@ -2,6 +2,10 @@
     <head>
         <meta charset="UTF-8">
         <style type='text/css'>
+        #treeName {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 18px;
+        }
         .category {
             font-family: Arial, Helvetica, sans-serif;
             font-style: italic;
@@ -12,6 +16,13 @@
             -moz-user-select: none; /* Firefox */
             -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently */
+        }
+        .feature {
+            font-size: 75.5%;
+            fill:dimgray;
+            vertical-align: bottom;
+            position: relative;
+            bottom: -0.3em
         }
         .word {
             font-size: 14px;
@@ -29,12 +40,55 @@
             background-color:lightcoral;
             outline: none;
         }
+        .fileOpen {
+            border: 1px dotted black;
+            background: white;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 5px 10px;
+            font-size: 18px;
+            width: 400px;
+            color:black;
+        }
+        .btn-square-pop {
+            position: relative;
+            display: inline-block;
+            padding: 0.25em 0.5em;
+            text-decoration: none;
+            color: #FFF;
+            background: #fd9535;/*背景色*/
+            border-bottom: solid 2px #d27d00;/*少し濃い目の色に*/
+            border-radius: 4px;/*角の丸み*/
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 2px 2px rgba(0, 0, 0, 0.19);
+            font-weight: bold;
+        }
+
+        .btn-square-pop:active {
+            border-bottom: solid 2px #fd9535;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
+        }
+
         </style>
         <link rel="stylesheet" href="d3-context-menu.css" />
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="d3-context-menu.js"></script>
+        <script src="parser.js"></script>
     </head>
     <body>
+        <div>
+        <h3>使い方</h3>
+        <h4>
+            <li> ノードを１クリックで子ノードとして選択し、別のノード２クリック目でそこに子ノードをくっつける。 </li>
+            <li> ノード右クリックでポップアップメニューあり。 </li>
+        </h4>
+        </div>
+        <input class="btn-square-pop" type="file" name="file" id="file">
+        <input type="button" class="btn-square-pop" value="PREV" onclick="nextTree(false)"/>
+        <input type="button" class="btn-square-pop" value="NEXT" onclick="nextTree(true)"/>
+        <input type="button" class="btn-square-pop" value="UNDO" onclick="undo()"/>
+        <input type="button" class="btn-square-pop" value="REDO" onclick="redo()"/>
+        <input type="button" class="btn-square-pop" value="SAVE" onclick=""/>
+        <div id="treeName"></div>
+        <div id="treeDisplay"></div>
         <script src="ccg.js"></script>
     </body>
 </html>

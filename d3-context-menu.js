@@ -5,7 +5,7 @@ d3.contextMenu = function (menu, openCallback) {
 		.enter()
 		.append('div')
 		.attr('class', 'd3-context-menu');
-	console.log('aaaa');
+
 	// close menu
 	d3.select('body').on('click.d3-context-menu', function() {
 		d3.select('.d3-context-menu').style('display', 'none');
