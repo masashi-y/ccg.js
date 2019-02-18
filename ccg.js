@@ -323,17 +323,19 @@ if(window.File && window.FileReader && window.FileList && window.Blob) {
 
 function save() {
     var data = '';
-    console.log('aa');
-    for (tree of trees) {
+    for (let i = 0; i < trees.length; i++) {
+        const tree = trees[i];
+        if (! tree.tree.isValid()) {
+            alert(`${i + 1}th tree is not valid CCG tree.`);
+            return;
+        }
         data += tree.name + '\n';
         data += AUTO.stringify(tree.tree) + '\n';
     }
-    console.log(data);
     var a = document.createElement('a');
     a.textContent = 'export';
     a.download = 'trees.auto';
     a.href = URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
     a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
     a.click();
-    console.log(a);
 }

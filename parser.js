@@ -145,6 +145,17 @@ CCGTree.prototype.copy = function() {
     return tree;
 }
 
+CCGTree.prototype.isValid = function() {
+    let valid = true;
+    this.root.each(node => {
+        if (node.children) {
+            valid &= node.children.length <= 2;
+        }
+        // TODO: check the validity of category structure as well.
+    });
+    return valid;
+}
+
 var AUTO = function() {};
 
 AUTO.parse = function(line) {
