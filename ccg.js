@@ -140,7 +140,6 @@ var Visualized = function (tree, separation=null) {
                 record();
                 let newNode = d.data.copy();
                 d.data.children = [newNode];
-                console.log(trees[index]);
                 trees[index].tree.add(newNode, d.data);
                 update();
             }
@@ -216,7 +215,8 @@ function setTreeName() {
 }
 
 function nextTree(next) {
-    if (0 > index || index >= trees.length - 1) return;
+    if (next && index >= trees.length - 1) return;
+    if (!next && 0 >= index) return;
     if (next) index++;
     else index--;
     jsonDict = trees[index].tree.root;
@@ -248,14 +248,12 @@ function updateHiercachy() {
 }
 
 function maxChildId(node) {
-    console.log(node);
     if (!node.children)
         return node.id;
     return Math.max.apply(null, node.children.map(maxChildId));
 }
 
 function record() {
-    // console.log(trees[index].tree.copy());
     editHistory.push(trees[index].tree.copy());
 }
 
@@ -269,9 +267,7 @@ function undo() {
 }
 
 function redo() {
-    console.log('bb');
     if (editHistoryRev.length > 0) {
-        console.log('bb');
         editHistory.push(trees[index].tree);
         trees[index].tree = editHistoryRev.pop();
         jsonDict = trees[index].tree.root;
@@ -295,7 +291,6 @@ let file = document.getElementById('file');
 if(window.File && window.FileReader && window.FileList && window.Blob) {
     function loadAutoFile(e) {
         var fileData = e.target.files[0];
-        console.log(fileData);
  
         var reader = new FileReader();
 
@@ -305,7 +300,6 @@ if(window.File && window.FileReader && window.FileList && window.Blob) {
             index = 0;
             for (var i = 0; i < cols.length-1; i+=2) {
                 var parsed = AUTO.parse(cols[i+1]);
-                console.log(parsed);
                 trees.push({ name: cols[i], tree: parsed });
             }
             jsonDict = trees[index].tree.root;

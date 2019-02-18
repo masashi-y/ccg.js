@@ -111,6 +111,7 @@ NonTerminal.prototype.contains = function(target) {
 };
 
 var CCGTree = function(root, update=true) {
+    console.log(root);
     this.root = root;
     this.id = 0;
     if (update) {
