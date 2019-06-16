@@ -1,0 +1,23 @@
+{
+    "name": "ccg.js",
+    "version": "0.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "scripts": {
+        "tsc": "tsc",
+        "build": "webpack"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "ts-loader": "^4.5.0",
+        "typescript": "^3.5.1",
+        "webpack": "^4.34.0",
+        "webpack-cli": "^3.3.4"
+    },
+    "dependencies": {
+        "@types/d3": "^5.7.2",
+        "d3": "^5.9.2",
+        "d3-context-menu": "^1.1.1"
+    }
+}

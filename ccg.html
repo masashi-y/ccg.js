@@ -18,7 +18,7 @@
             user-select: none; /* Non-prefixed version, currently */
         }
         .feature {
-            font-size: 75.5%;
+            font-size: 50%;
             fill:dimgray;
             vertical-align: bottom;
             position: relative;
@@ -70,8 +70,6 @@
         </style>
         <link rel="stylesheet" href="d3-context-menu.css" />
         <script src="https://d3js.org/d3.v5.min.js"></script>
-        <script src="d3-context-menu.js"></script>
-        <script src="parser.js"></script>
     </head>
     <body>
         <div>
@@ -82,13 +80,13 @@
         </h4>
         </div>
         <input class="btn-square-pop" type="file" name="file" id="file">
-        <input type="button" class="btn-square-pop" value="PREV" onclick="nextTree(false)"/>
-        <input type="button" class="btn-square-pop" value="NEXT" onclick="nextTree(true)"/>
-        <input type="button" class="btn-square-pop" value="UNDO" onclick="undo()"/>
-        <input type="button" class="btn-square-pop" value="REDO" onclick="redo()"/>
-        <input type="button" class="btn-square-pop" value="SAVE" onclick="save()"/>
-        <div id="treeName"></div>
-        <div id="treeDisplay"></div>
-        <script src="ccg.js"></script>
+        <input id="button-prev" type="button" class="btn-square-pop" value="PREV"/>
+        <input id="button-next" type="button" class="btn-square-pop" value="NEXT"/>
+        <input id="button-undo" type="button" class="btn-square-pop" value="UNDO"/>
+        <input id="button-redo" type="button" class="btn-square-pop" value="REDO"/>
+        <input id="button-save" type="button" class="btn-square-pop" value="SAVE"/>
+        <div id="tree-name"></div>
+        <div id="tree-display"></div>
+        <script src="dist/index.js"></script>
     </body>
 </html>
