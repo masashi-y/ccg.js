@@ -1,5 +1,5 @@
-import { Tree, AUTO, test } from "./parser"
-import { VisualizedTree } from "./ccg"
+import { Tree, AUTO, test } from "./tree"
+import { VisualizedTree } from "./visualize"
 
 interface Window {
     File: any,
@@ -70,25 +70,24 @@ function loadAutoFile(e: any) {
 
 
 function save(): void {
-    console.log('tehs')
     let data = ''
     for (let i = 0; i < trees.length; i++) {
         const tree = trees[i]
-        if (! tree.tree.valid()) {
-            alert(`${i + 1}th tree is not valid CCG tree.`)
+        let msg = tree.tree.check()
+        console.log(msg)
+        if (msg.length > 0) {
+            alert(`${i + 1}th tree is not valid CCG tree.\n` + msg.join("\n"))
             return
         }
         data += tree.name + '\n'
         data += AUTO.stringify(tree.tree) + '\n'
     }
-    console.log('tehs')
-    let a = document.createElement('a')
+    let a = document.getElementById('download') as HTMLAnchorElement
     a.textContent = 'export'
     a.download = 'trees.auto'
     a.href = URL.createObjectURL(new Blob([data], { type: 'text/plain' }))
     a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':')
     a.click()
-    console.log('tehs')
 }
 
 let file = document.getElementById('file')!
@@ -106,3 +105,22 @@ document.getElementById('button-next')!.onclick = nextTree
 document.getElementById('button-undo')!.onclick = visualized.undo
 document.getElementById('button-redo')!.onclick = visualized.redo
 
+import { Category } from './cat'
+
+let test_ = (cat: string): void => {
+    console.log(cat)
+    console.log(Category.parse(cat).string)
+}
+test_("S[dcl]/NP")
+test_("((S[b]\\NP)/NP)/NP")
+test_("((NP\\NP)/(S[dcl]\\NP))\\(NP/NP)")
+test_("S[qem]/(S[dcl]\\NP)")
+test_("S[em]/S[dcl]")
+test_("((S/S)/(S[adj]\\NP))/NP")
+test_("(S[pss]\\NP)/PP")
+test_("NP/((S[to]\\NP)/NP)")
+test_("(NP\\NP)/NP")
+test_("S[ng]\\NP")
+test_("(S[pt]\\NP)/S[qem]")
+test_("S[qem]/(S[to]\\NP)")
+test_("((S/S)/S[dcl])/(S[adj]\\NP)")

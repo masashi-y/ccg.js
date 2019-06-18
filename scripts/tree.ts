@@ -1,5 +1,6 @@
 
 import * as Utils from './utils';
+import { Grammar, EnglishGrammar } from './grammar';
 
 export let test = "(<T S[dcl] 0 2>" +
 "     (<T S[dcl] 0 2>" +
@@ -26,13 +27,23 @@ export let test = "(<T S[dcl] 0 2>" +
 "    (<L . XX XX . .>)" +
 " )"
 
+export class InvalidEditError implements Error {
+    public name = 'InvalidEditError'
+    constructor(public message: string) { }
+  
+    toString() {
+      return this.name + ': ' + this.message;
+    }
+}
 
 type Category = string;
 
 export type status = "normal" | "selected"
 
+let realizationOrder = (a: Node, b: Node) =>
+        a.leftMostChild().index < b.leftMostChild().index ? -1 : 1
+
 export class Node {
-    orig?: Node
     width: number
     status: string
     private constructor(public cat: Category,
@@ -41,7 +52,6 @@ export class Node {
                 public tag2?: string,
                 public word?: string,
                 public index?: number) {
-        this.orig = undefined
         this.width = 0
         this.status = "normal"
     }
@@ -54,20 +64,34 @@ export class Node {
         return new Node(cat, children)
     }
 
+    // turn this node into nonterminal node
+    raise(): void {
+        this.tag1 = this.tag2 = this.word = this.index = undefined
+    }
+
     each(f: (node: Node) => void): void {
         f(this)
         this.children.forEach(node => node.each(f))
     }
 
-    removeChild(node: Node): void {
-        this.children = this.children.filter(child => child !== node)
+    removeChild(...nodes: Node[]): void {
+        this.children = this.children.filter(child =>
+            nodes.every(node => child !== node)
+        )
     }
 
     pushChild(...nodes: Node[]): void {
         Array.prototype.push.apply(this.children, nodes)
     }
 
-    leaves(): Terminal[] {
+    attachChildren(...children: Node[]): void {
+        let prevNode = this.deepcopy()
+        this.removeChild(...children)
+        this.pushChild(...children)
+        this.children.sort(realizationOrder)
+    }
+
+    get leaves(): Terminal[] {
         let res: Terminal[] = []
         this.each((node: Node) => {
             if (isTerminal(node))
@@ -89,8 +113,7 @@ export class Node {
     }
 
     contains(target: Node): boolean {
-        return this === target ||
-         this.children.some(node => node == target)
+        return this === target || this.children.some(node => node == target)
     }
 
     // contains(target: Node): boolean {
@@ -114,7 +137,6 @@ export class Node {
                                this.tag2,
                                this.word,
                                this.index)
-        newNode.orig = this.orig
         newNode.width = this.width
         newNode.status = this.status
         return newNode
@@ -136,7 +158,7 @@ export interface NonTerminal {
 }
 
 export function isTerminal(x: any): x is Terminal {
-    return typeof x.word !== 'undefined'
+    return x.children.length == 0
 }
 
 export function isNonTerminal(x: any): x is NonTerminal {
@@ -147,14 +169,16 @@ export class Tree {
     constructor(public root: Node,
                 public index: number = 0) {}
 
-    valid(): boolean {
-        let valid = true
-        this.root.each(node => {
-            if (isNonTerminal(node)) {
-                valid = valid && node.children.length <= 2
-            }
-        })
-        return valid
+    check(): string[] {
+        let logs = EnglishGrammar.check(this.root)
+        return logs
+        // let valid = true
+        // this.root.each(node => {
+        //     if (isNonTerminal(node)) {
+        //         valid = valid && node.children.length <= 2
+        //     }
+        // })
+        // return valid
     }
 
     nodes(): Array<Node> {
@@ -223,3 +247,5 @@ export namespace AUTO {
 
 
 console.log(AUTO.stringify(AUTO.parse(test)));
+let tree = AUTO.parse(test)
+console.log(isTerminal(tree.root))
