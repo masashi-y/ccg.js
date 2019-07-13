@@ -35,6 +35,7 @@ export class Copyable<T> {
 declare global {
     interface Array<T> {
         equals(other: Array<T>): boolean
+        includes(item: T): boolean
     }
 }
 
@@ -54,6 +55,10 @@ Array.prototype.equals = function<T>(array: Array<T>) {
         }           
     }       
     return true;
+}
+
+Array.prototype.includes = function<T>(item: T) {
+    return this.indexOf(item) > -1
 }
 
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});

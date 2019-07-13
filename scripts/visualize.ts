@@ -67,17 +67,13 @@ class NodeContextMenu {
         return d3ContextMenu(menu)
     }
     
-    done = (): void => {
-        this.tree.selected = undefined
-    }
-
     duplicateNode = (elm: any, d: d3Node, i: number) => {
         this.tree.recorder.record()
         let child = d.data.deepcopy()
         d.data.raise()
         d.data.children = [child]
         this.tree.draw()
-        this.done()
+        this.tree.cleanup()
     }
         
     deleteNode = (elm: any, d: d3Node, i: number) => {
@@ -90,13 +86,12 @@ class NodeContextMenu {
             else
                 this.tree.undo()
         }
-        this.done()
+        this.tree.cleanup()
     }
 
     editCategory = (elm: any, d: d3Node, i: number) => {
-        // selectedNodeEdit = d;
         d3.selectAll(".category-edits").remove()
-        d3.select("g").append("foreignObject")
+        this.tree.canvas1.select("g").append("foreignObject")
             .attr("class", "category-edits")
             .attr("x", d.x)
             .attr("y", d.y)
@@ -120,23 +115,27 @@ class NodeContextMenu {
             }
             return false
         }
-        this.done()
+        this.tree.cleanup()
     }
 }
 
 export class VisualizedTree {
     svg: d3Selection<SVGSVGElement>
+    canvas1: d3Selection<SVGGElement>
     canvas: d3Selection<SVGGElement>
     links: d3Selection<SVGGElement>
     nodes: d3Selection<SVGGElement>
     recorder: EditRecorder<Node>
     selected?: d3Node
     root: d3Node
+    xMin: number
+    xMax: number
     constructor(public tree: Tree) {
         this.svg = d3.select<SVGSVGElement, Node>("#tree-display").append("svg")
-        this.svg.on('click', () => d3.selectAll(".category-edits").remove())
-        
-        this.canvas = this.svg.append("g")
+            .attr('cursor', 'move')
+
+        this.canvas1 = this.svg.append("g")
+        this.canvas = this.canvas1.append("g")
         this.links = this.canvas.append("g")
             .attr("fill", "none")
             .attr("stroke", "#555")
@@ -145,11 +144,17 @@ export class VisualizedTree {
         this.nodes = this.canvas.append("g")
         this.recorder = new EditRecorder(tree.root)
         this.root = this.initCoordinates()
+        this.xMin = Infinity
+        this.xMax = -Infinity
     }
 
     draw(): void {
         this.initCoordinates()
         this.update()
+    }
+
+    cleanup = (): void => {
+        this.selected = undefined
     }
 
     initCoordinates(): d3Node {
@@ -161,22 +166,23 @@ export class VisualizedTree {
                 .separation((a, b) =>
                     (a.data.width + b.data.width) / 2 + 50)
                 (hierachy)
+        this.root.each(d => {
+            if (d.x < this.xMin) this.xMin = d.x
+            if (d.x > this.xMax) this.xMax = d.x
+        })
         return this.root
     }
 
     update(): void {
-        let x0 = Infinity
-        let x1 = -x0
-        this.root.each(d => {
-            if (d.x > x1) x1 = d.x
-            if (d.x < x0) x0 = d.x
-        })
-
-        this.svg.style("width", `${x1 - x0 + MARGIN.left + MARGIN.right + 30}`)
+        // this.svg.style("width", `${x1 - x0 + MARGIN.left + MARGIN.right + 30}`)
+        this.svg.style("width", "100%")
                 .style("height", "100%")
 
-        this.canvas.attr("transform", `translate(${MARGIN.left - x0}, 30)`)
+        this.svg.call(d3.zoom<SVGSVGElement, Node>().on('zoom', () => 
+            this.canvas1.attr('transform', d3.event.transform)))
 
+        this.canvas.attr("transform", `translate(${MARGIN.left - this.xMin}, 30)`)
+        
         this.links.selectAll("path")
             .data(this.root.links())
             .join("path")
@@ -184,9 +190,9 @@ export class VisualizedTree {
                 M ${d.target.x}, ${d.target.y}
                 L ${d.source.x}, ${d.source.y}
             `)
-
-        let nodes = this.nodes.selectAll("g")
-            .data(this.root.descendants())
+        
+        let nodes = this.nodes.selectAll<SVGGElement, d3Node>("g")
+            .data(this.root.descendants(), d => d.data.cat)
             .join("g")
             .attr("transform", d => `translate(${d.x}, ${d.y})`)
             .on("contextmenu", new NodeContextMenu(this).draw())
@@ -219,13 +225,7 @@ export class VisualizedTree {
             .html(this.statusIcon)
     }
 
-    statusIcon = (d: d3Node) => {
-        if (d === this.selected) {
-            return statusIcon["selected"]
-        } else {
-            return statusIcon[d.data.status]
-        }
-    }
+    statusIcon = (d: d3Node) => statusIcon[d === this.selected ? "selected" : d.data.status]
 
     sanityCheck = () => {
         let prevLeaves = this.recorder.peek()!.leaves.map(d => d.index)

@@ -116,19 +116,6 @@ export class Node {
         return this === target || this.children.some(node => node == target)
     }
 
-    // contains(target: Node): boolean {
-    //     function rec(node: Node): boolean {
-    //         if (isNonTerminal(node)) {
-    //             if (node === target)
-    //                 return true
-    //             else
-    //                 return node.children.some(rec)
-    //         } else
-    //             return false
-    //     }
-    //     return this.children.some(rec)
-    // }
-
     deepcopy(): Node {
         let children = this.children.map(d => d.deepcopy())
         let newNode = new Node(this.cat,
@@ -141,7 +128,6 @@ export class Node {
         newNode.status = this.status
         return newNode
     }
-
 }
 
 export interface Terminal {
